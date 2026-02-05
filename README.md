@@ -19,9 +19,9 @@ These screenshots show the Launchpad98 OSD UI reacting to the selected mode, wit
 Launchpad98 extends the Launchpad95 OSD with a Max for Live device and a JavaScript extension (L95_ext.js) that listens for mode changes and dynamically updates an on-screen UI with screenshots and mode info.
 
 ### Why does it exist?
-It’s inspired by the original LPC-Live OSD—an incredible Launchpad script that’s now defunct and broken in modern versions of Ableton Live (the Wayback Machine is the only way to see the LPC-Live 2 product page). LPC-Live is how I originally learned Ableton, and its dynamic, mode-aware UI set a standard that never really got replaced.
+It’s inspired by the [LPC-Live 2](https://web.archive.org/web/20171211222033/http://www.nativekontrol.com/LPC-Live_2.html) OSD — an incredible Launchpad script that’s now defunct and broken in modern versions of Ableton Live (the Wayback Machine is the only way to see the LPC-Live 2 product page). LPC-Live 2 is how I originally learned Ableton, and its dynamic, mode-aware UI set a standard that never really got replaced.
 
-When LPC-Live broke years ago, I switched to Launchpad95. It was (and still is) an excellent control surface, and my prior LPC-Live experience helped me adapt quickly. But the lack of a dynamic UI showing the current mode was a real downgrade—especially for learning and muscle-memory building.
+When LPC-Live 2 broke years ago, I switched to Launchpad95. It was (and still is) an excellent control surface, and my prior LPC-Live 2 experience helped me adapt quickly. But the lack of a dynamic UI showing the current mode was a real downgrade—especially for learning and muscle-memory building.
 
 That gap became even more obvious years later while watching my younger brother struggle to learn Ableton. It was clear there was still a strong need for a modern, LPC-style dynamic OSD for Launchpad95. That’s when Launchpad98 was born (yes, a Launchpad2000 is also in the works—more on that later).
 
