@@ -5,8 +5,10 @@ This project adds a dynamic on-screen display (OSD) and documentation assets on 
 **UI Examples**
 These screenshots show the Launchpad98 OSD UI reacting to the selected mode, with Launchpad95 info at the top and toggleable sections. Images sourced from the Launchpad95 manual.
 
-![Launchpad98 OSD toggled sections](toggledsections.png)
-![Launchpad98 OSD demo](demo.png)
+<p>
+  <img src="toggledsections.png" width="45%" style="margin-right:10px;">
+  <img src="demo.png" width="45%">
+</p>
 
 ## Installation Instructions
 **Download the original Launchpad95 first**
