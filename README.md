@@ -2,6 +2,13 @@
 
 This project adds a dynamic on-screen display (OSD) and documentation assets on top of the original Launchpad95 Remote Script. It is intended to be layered on top of a standard Launchpad95 installation so it can be shared as a mod overlay.
 
+**UI Examples**
+These screenshots show the Launchpad98 OSD UI reacting to the selected mode, with Launchpad95 info at the top and toggleable sections. Images sourced from the Launchpad95 manual.
+
+![Launchpad98 OSD demo](demo.png)
+![Launchpad98 OSD toggled sections](toggledsections.png)
+
+## Installation Instructions
 **Download the original Launchpad95 first**
 ```
 https://motscousus.com/stuff/2011-07_Novation_Launchpad_Ableton_Live_Scripts/
@@ -41,8 +48,3 @@ Launchpad95 Mode Screenshots\
 The dynamic behavior comes from `M4LDevice\L95_ext.js`. The modded OSD (`Launchpad98OSD.amxd`) is recommended because it includes the UI sections used by the script (info, mode guide, mode info). The original OSD can show basic info, but it will not expose all sections or dynamic layout features.
 If you want, you can also run the Launchpad98 OSD alongside the original Launchpad95 OSD (for example, to keep the Launchpad95 Info in a separate window).
 
-**UI Examples**
-These screenshots show the Launchpad98 OSD UI reacting to the selected mode, with Launchpad95 info at the top and toggleable sections. Images sourced from the Launchpad95 manual.
-
-![Launchpad98 OSD demo](demo.png)
-![Launchpad98 OSD toggled sections](toggledsections.png)
