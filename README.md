@@ -56,7 +56,7 @@ C:\Users\<You>\Documents\Ableton\User Library\Remote Scripts\Launchpad95
 ```
 
 ### Install this mod (overlay)
-1. From this project, either download the latest release and extract the contents into your Launchpad95 folder in your Ableton Remote Sripts (recommended), or download and copy the contents of the `Launchpad98` folder on top of the base `Launchpad95` folder.
+1. From this project, either download the latest release and extract the contents into your Launchpad95 folder in your Ableton Remote Scripts folder (recommended), or download and copy the contents of the `Launchpad98` folder on top of the base `Launchpad95` folder.
 2. Overwrite when prompted.
 3. Use `Launchpad98/MOD_OVERLAY_GUIDE.md` to see exactly which files are changed/added.
 4. If you are using the drop-in zip, unzip it and copy its contents directly into your existing `Launchpad95` folder, then overwrite.
@@ -66,11 +66,11 @@ C:\Users\<You>\Documents\Ableton\User Library\Remote Scripts\Launchpad95
 ```
 Launchpad98\M4LDevice\Launchpad98OSD.amxd
 ```
-2. Recommended: keep the entire `M4LDevice` folder together so the device can load `L95_ext.js` and the JSON UI sections.
+2. Recommended: keep the entire `M4LDevice` folder together so the device can load `L95_ext.js` and the JSON UI sections. Load it from Remote Scripts\Launchpad 95\M4LDevice\.
 3. If you copy the `.amxd` into Ableton's Max for Live Presets folder, make sure these folders are still in Max's search path:
 ```
-Launchpad98\M4LDevice\
-Launchpad98\Launchpad95 Mode Screenshots\
+Launchpad95\M4LDevice\
+Launchpad95\Launchpad95 Mode Screenshots\
 ```
 
 ## Which OSD should I use?
