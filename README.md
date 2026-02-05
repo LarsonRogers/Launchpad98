@@ -77,6 +77,11 @@ Launchpad98\Launchpad95 Mode Screenshots\
 The dynamic behavior comes from `M4LDevice\L95_ext.js`. The modded OSD (`Launchpad98OSD.amxd`) is recommended because it includes the UI sections used by the script (info, mode guide, mode info). The original OSD can show basic info, but it will not expose all sections or dynamic layout features.
 If you want, you can also run the Launchpad98 OSD alongside the original Launchpad95 OSD (for example, to keep the Launchpad95 Info in a separate window).
 
+## To-Dos
+- Change .amxd launcher window text to read "Launchpad98 OSD" with the sub-title "Based on Launchpad95"
+- Change OSD window header text to "Launchpad98 OSD - Based on Launchpad95"
+(_both penchant upon hearing back from Launchpad95 dev, hdave_)
+
 ## Future Plans - Launchpad2000
 While Launchpad98 is a significant upgrade to Launchpad95's existing OSD, I think we can do better. The next goal is to create an OSD overlay for Launchpad95 with a fully dynanmic Launchpad grid, each pad and button (and associated text) updating live in the OSD window alongside the connected Launchpad device, supporting both the MK1 colors and full RGB for later Launchpad models.
 
