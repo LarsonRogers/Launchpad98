@@ -1,6 +1,10 @@
-# Launchpad95 OSD Mod (Launchpad98)
+# Launchpad98 (Launchpad95 OSD Mod)
 
-This project adds a dynamic on-screen display (OSD) and documentation assets on top of the original Launchpad95 Remote Script. It is intended to be layered on top of a standard Launchpad95 installation so it can be shared as a mod overlay.
+This project adds a dynamic on-screen display (OSD) and documentation assets on top of the original [Launchpad95](https://motscousus.com/stuff/2011-07_Novation_Launchpad_Ableton_Live_Scripts/) Remote Script. It is intended to be layered on top of a standard Launchpad95 installation so it can be shared as a mod overlay.
+
+It was inspired by the old LPC-Live UI (broken in modern Ableton Live), which is how I learned to use Ableton. 
+
+When LPC_Live first broke years ago, I found [Launchpad95](https://motscousus.com/stuff/2011-07_Novation_Launchpad_Ableton_Live_Scripts/) and was able to get up to speed there due to my previous experience with LPC-Live, but the lack of a dyanmic UI showing the current user mode made things more difficult. Years later, watching my little brother struggling to learn to use Ableton, I realized there was a real need within the community for a working, LPC-Style dynamic OSD for Launchpad95, so here we are!
 
 ## UI Examples
 These screenshots show the Launchpad98 OSD UI reacting to the selected mode, with Launchpad95 info at the top and toggleable sections. Images sourced from the Launchpad95 manual.
@@ -11,9 +15,11 @@ These screenshots show the Launchpad98 OSD UI reacting to the selected mode, wit
 
 ## Installation Instructions
 **Download the original Launchpad95 first**
-```
-https://motscousus.com/stuff/2011-07_Novation_Launchpad_Ableton_Live_Scripts/
-```
+
+[Launchpad95 site](https://motscousus.com/stuff/2011-07_Novation_Launchpad_Ableton_Live_Scripts/)
+
+Or you can download from the GitHub repo if you'd prefer, but note that the Launchpad95 user manual is on the dev's site linked above.
+[Launchpad95 GitHub repo](https://github.com/hdavid/Launchpad95)
 
 **Install Launchpad95 (base)**
 1. Download and unzip Launchpad95 from the link above.
