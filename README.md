@@ -19,7 +19,7 @@ These screenshots show the Launchpad98 OSD UI reacting to the selected mode, wit
 Launchpad98 extends the Launchpad95 OSD with a Max for Live device and a JavaScript extension (L95_ext.js) that listens for mode changes and dynamically updates an on-screen UI with screenshots and mode info.
 
 ### Why does it exist?
-It’s inspired by the original LPC-Live OSD—an incredible learning tool that’s now defunct and broken in modern versions of Ableton Live (the Wayback Machine is the only way to see it). LPC-Live is how I originally learned Ableton, and its dynamic, mode-aware UI set a standard that never really got replaced.
+It’s inspired by the original LPC-Live OSD—an incredible Launchpad script that’s now defunct and broken in modern versions of Ableton Live (the Wayback Machine is the only way to see the LPC-Live 2 product page). LPC-Live is how I originally learned Ableton, and its dynamic, mode-aware UI set a standard that never really got replaced.
 
 When LPC-Live broke years ago, I switched to Launchpad95. It was (and still is) an excellent control surface, and my prior LPC-Live experience helped me adapt quickly. But the lack of a dynamic UI showing the current mode was a real downgrade—especially for learning and muscle-memory building.
 
@@ -39,7 +39,8 @@ If you don't already have Launchpad95 installed, you must download and install i
 
 [Launchpad95 site](https://motscousus.com/stuff/2011-07_Novation_Launchpad_Ableton_Live_Scripts/)
 
-Or you can download from the GitHub repo if you'd prefer, but note that the Launchpad95 user manual is on the dev's site linked above.
+Or you can download from the GitHub repo if you'd prefer, but note that the Launchpad95 user manual is on the dev's site linked above:
+
 [Launchpad95 GitHub repo](https://github.com/hdavid/Launchpad95)
 
 ### Install Launchpad95 (base)
@@ -77,6 +78,6 @@ The dynamic behavior comes from `M4LDevice\L95_ext.js`. The modded OSD (`Launchp
 If you want, you can also run the Launchpad98 OSD alongside the original Launchpad95 OSD (for example, to keep the Launchpad95 Info in a separate window).
 
 ## Future Plans - Launchpad2000
-While Launchpad98 is a significant upgrade to Launchpad95's existing OSD, I think we can do better. The next goal is to create an OSD overlay for Launchpad95 with a fully dynanmic Launchpad grid, each pad and button (and associated text) updating live in the OSD window alongside the connected Launchpad device, supporting the both the MK1 colors and full RGB on later Launchpad models.
+While Launchpad98 is a significant upgrade to Launchpad95's existing OSD, I think we can do better. The next goal is to create an OSD overlay for Launchpad95 with a fully dynanmic Launchpad grid, each pad and button (and associated text) updating live in the OSD window alongside the connected Launchpad device, supporting both the MK1 colors and full RGB for later Launchpad models.
 
 That project is underway, and is called...Launchpad2000 (we're skipping 98 SE and ME, obviously).
