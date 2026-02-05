@@ -1,19 +1,23 @@
 # Launchpad98 (Launchpad95 OSD Mod)
 
-This project adds a dynamic on-screen display (OSD) and documentation assets on top of the original [Launchpad95](https://motscousus.com/stuff/2011-07_Novation_Launchpad_Ableton_Live_Scripts/) Remote Script. It is intended to be layered on top of a standard Launchpad95 installation so it can be shared as a mod overlay.
+This project adds a dynamic on-screen display (OSD) on top of the original [Launchpad95](https://motscousus.com/stuff/2011-07_Novation_Launchpad_Ableton_Live_Scripts/) Remote Script. It is intended to be layered on top of a standard Launchpad95 installation so it can be shared as a mod overlay.
+
+If you like this and/or want to support my future projects, you can buy my next caffinated beverage by donating through Ko-Fi using the button below:
+
+<script type='text/javascript' src='https://storage.ko-fi.com/cdn/widget/Widget_2.js'></script><script type='text/javascript'>kofiwidget2.init('Support me on Ko-fi', '#72a4f2', 'E1E81TNZGD');kofiwidget2.draw();</script> 
 
 **FAQ**
 Launchpad98 extends the Launchpad95 OSD using a Max for Live device plus a JS extension (`L95_ext.js`) that listens for mode changes and updates the on-screen UI (screenshots + mode info) dynamically.
 
-It was inspired by the old [LPC-Live](https://web.archive.org/web/20171211222033/http://www.nativekontrol.com/LPC-Live_2.html) UI (broken in modern Ableton Live), which is how I learned to use Ableton (that WayWayBack machine link is the only way to view the old LPC-Live 2 page on NativeKontrol, the project is entirely defunct).
+It was inspired by the old [LPC-Live](https://web.archive.org/web/20171211222033/http://www.nativekontrol.com/LPC-Live_2.html) OSD UI (broken in modern Ableton Live), which is how I learned to use Ableton (that WayWayBack machine link is the only way to view the old LPC-Live 2 page on NativeKontrol, the project is entirely defunct).
 
-When LPC_Live first broke years ago, I found Launchpad95 as an approximate replacement and was able to get up to speed quickly due to my previous experience with LPC-Live, but the lack of a dyanmic UI showing the current user mode was a serious downgrade and made things more difficult. Years later, watching my little brother struggling to learn to use Ableton, I realized there was a real need for a working, LPC-Style dynamic OSD for Launchpad95, so Launchpad98 was born (yes, there's a Launchpad2000 in the works as well, more on that later).
+When LPC_Live first broke years ago, I found Launchpad95 as an approximate replacement and was able to get up to speed quickly due to my previous experience with LPC-Live. That said, the lack of a dyanmic UI showing the current user mode was a serious downgrade and made things more difficult. Years later, watching my little brother struggling to learn to use Ableton, I realized there was a real need for a working, LPC-Style dynamic OSD for Launchpad95, so Launchpad98 was born (yes, there's a Launchpad2000 in the works as well, more on that later).
 
 Launchpad95 was already an excellent tool, but Launchpad98's dynamic OSD elevates the user experience significantly for beginners and veterans alike.
 
 Notes:
-- I have not tested on MacOS, won't be able to until my Mac arrives this weekend.
-- This has not been tested with Launchpad95Pro, as I do not have a Launchpad Pro to test with.
+- I have not tested on MacOS, won't be able to until this weekend, but it _should_ be platform agnostic.
+- This has not been tested with Launchpad95Pro, as I do not have a Launchpad Pro to test with (feel free to [donate to the fund](https://ko-fi.com/markettwain#linkModal) if you'd like!).
 
 ## UI Examples
 These screenshots show the Launchpad98 OSD UI reacting to the selected mode, with Launchpad95 info at the top and toggleable sections. Images sourced from the Launchpad95 manual.
