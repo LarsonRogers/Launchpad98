@@ -34,12 +34,10 @@ var show_info_section = 1;
 var show_guide_section = 1;
 var show_modeinfo_section = 1;
 
-var margin_ratio = 0.10;
 var section_gap = 8;
 var menu_height = 24;
 var guide_label_height = 20;
 var info_label_height = 20;
-var info_box_height = 220;
 
 var info_base = null;
 var info_scale = 1;
@@ -620,13 +618,8 @@ var boot_max = 10;
 var l95_located = 0;
 var l95_not_found_reported = 0;
 var ui_located = 0;
-var max_screen_w = 0;
 var window_pad = 8;
-var sync_done = 1;
 var section_pad = 10;
-var _modeinfo_guard_until = 0;
-var _modeinfo_last_toggle = 1;
-var _modeinfo_last_value = 1;
 var boot_failed_reported = 0;
 
 function _bool_from(v){
@@ -663,20 +656,6 @@ function safe_live_getcount(api, prop, fallback) {
     } catch (e) {
         return fallback;
     }
-}
-
-function sync_toggle_state(){
-    try {
-        if (toggle_info && toggle_info.getvalueof) {
-            show_info_section = _bool_from(toggle_info.getvalueof());
-        }
-        if (toggle_guide && toggle_guide.getvalueof) {
-            show_guide_section = _bool_from(toggle_guide.getvalueof());
-        }
-        if (toggle_modeinfo && toggle_modeinfo.getvalueof) {
-            show_modeinfo_section = _bool_from(toggle_modeinfo.getvalueof());
-        }
-    } catch (e) { }
 }
 
 function get_base_dir(){
@@ -770,18 +749,6 @@ function loadbang(){
     if (!l95_osd) {
         start_boot();
     }
-}
-
-function compute_max_screen_w(){
-    if (max_screen_w > 0) { return max_screen_w; }
-    var w = 0;
-    for (var k in MODE_MAP) {
-        if (!MODE_MAP.hasOwnProperty(k)) { continue; }
-        var d = MODE_MAP[k];
-        if (d && d.w && d.w > w) { w = d.w; }
-    }
-    max_screen_w = sane_dim(w, 720, 320, 2000);
-    return max_screen_w;
 }
 
 function compute_screenshots_dir(){
