@@ -266,10 +266,10 @@ function set_att_box(index, box, is_name) {
 }
 
 function setup_attribute_boxes(container) {
-    if (!container || !container.getnamed) { return; }
+    if (!container) { return; }
     for (var i = 0; i < 8; i++) {
-        set_att_box(i, container.getnamed("att_" + i), 0);
-        set_att_box(i, container.getnamed("att_n_" + i), 1);
+        set_att_box(i, safe_getnamed(container, "att_" + i), 0);
+        set_att_box(i, safe_getnamed(container, "att_n_" + i), 1);
     }
 }
 
@@ -407,15 +407,15 @@ function update(args){
         return;
     }
 
-    var shots = l95_osd.get("screenshots_dir");
+    var shots = safe_live_get(l95_osd, "screenshots_dir", []);
     if (shots && shots.length) { shots = shots[0]; }
     if (shots && shots.length) { set_screenshots_dir(shots); }
 
-    var info = l95_osd.get("info") || [];
-    var attributes = l95_osd.get("attributes") || [];
-    var attribute_names = l95_osd.get("attribute_names") || [];
-    var mode_val = l95_osd.get("mode");
-    var mode_id_val = l95_osd.get("mode_id");
+    var info = safe_live_get(l95_osd, "info", []) || [];
+    var attributes = safe_live_get(l95_osd, "attributes", []) || [];
+    var attribute_names = safe_live_get(l95_osd, "attribute_names", []) || [];
+    var mode_val = safe_live_get(l95_osd, "mode", []);
+    var mode_id_val = safe_live_get(l95_osd, "mode_id", []);
 
     if (mode_val && mode_val.length) { mode_val = mode_val[0]; }
     if (mode_id_val && mode_id_val.length) { mode_id_val = mode_id_val[0]; }
@@ -490,7 +490,7 @@ function set_box_rect(box, rect){
 
 function osd_patcher(){
     try {
-        var x = this.patcher.getnamed("osd");
+        var x = safe_getnamed(this.patcher, "osd");
         if (x && x.subpatcher) { return x.subpatcher(); }
     } catch (e) { }
     return null;
@@ -586,8 +586,9 @@ var log_path = "";
 var last_screenshot_path = "";
 var boot_task = null;
 var boot_attempts = 0;
-var boot_max = 12;
+var boot_max = 10;
 var l95_located = 0;
+var l95_not_found_reported = 0;
 var ui_located = 0;
 var max_screen_w = 0;
 var window_pad = 8;
@@ -596,6 +597,7 @@ var section_pad = 10;
 var _modeinfo_guard_until = 0;
 var _modeinfo_last_toggle = 1;
 var _modeinfo_last_value = 1;
+var boot_failed_reported = 0;
 
 function _bool_from(v){
     if (v === undefined || v === null) { return 0; }
@@ -606,6 +608,31 @@ function _bool_from(v){
         return 1;
     }
     return (v != 0);
+}
+
+function safe_getnamed(container, name) {
+    if (!container || !container.getnamed || !name) { return null; }
+    try { return container.getnamed(name); } catch (e) { return null; }
+}
+
+function safe_live_get(api, prop, fallback) {
+    if (!api || !api.get) { return fallback; }
+    try {
+        var v = api.get(prop);
+        return (v === undefined || v === null) ? fallback : v;
+    } catch (e) {
+        return fallback;
+    }
+}
+
+function safe_live_getcount(api, prop, fallback) {
+    if (!api || !api.getcount) { return fallback; }
+    try {
+        var n = api.getcount(prop);
+        return (n === undefined || n === null) ? fallback : n;
+    } catch (e) {
+        return fallback;
+    }
 }
 
 function sync_toggle_state(){
@@ -628,7 +655,7 @@ function get_base_dir(){
         p = this.patcher.parentpatcher.filepath;
     }
     if ((!p || p.length === 0)) {
-        var osd = this.patcher.getnamed("osd");
+        var osd = safe_getnamed(this.patcher, "osd");
         if (osd && osd.subpatcher) {
             p = osd.subpatcher().filepath;
         }
@@ -684,6 +711,7 @@ function log(msg){
 function start_boot(){
     if (boot_task) { boot_task.cancel(); }
     boot_attempts = 0;
+    if (l95_osd && mode_guide_pic && mode_info_box) { return; }
     boot_task = new Task(function(){
         boot_attempts++;
         update();
@@ -694,17 +722,24 @@ function start_boot(){
         }
         if (boot_attempts >= boot_max) {
             log("boot timeout");
+            if (!boot_failed_reported) {
+                error("L95_ext: Launchpad95 M4LInterface not found after " + boot_max + " attempts.");
+                boot_failed_reported = 1;
+            }
             boot_task.cancel();
         }
     }, this);
-    boot_task.interval = 200;
+    boot_task.interval = 500;
     boot_task.repeat(boot_max);
 }
 
 function loadbang(){
     log("loadbang");
+    boot_failed_reported = 0;
     bang();
-    start_boot();
+    if (!l95_osd) {
+        start_boot();
+    }
 }
 
 function compute_max_screen_w(){
@@ -725,7 +760,7 @@ function compute_screenshots_dir(){
         p = this.patcher.parentpatcher.filepath;
     }
     if ((!p || p.length === 0)) {
-        var osd = this.patcher.getnamed("osd");
+        var osd = safe_getnamed(this.patcher, "osd");
         if (osd && osd.subpatcher) {
             p = osd.subpatcher().filepath;
         }
@@ -792,21 +827,33 @@ function load_screenshot(filename){
 }
 
 function locate_l95(){
-    var api = new LiveAPI();
+    var api = null;
+    try {
+        api = new LiveAPI();
+    } catch (e0) {
+        l95_located = -1;
+        return;
+    }
     var l95_id = -1;
     for (var i = 0; i < 16; i++) {
-        api.goto("control_surfaces " + i);
-        if (!api.type) { continue; }
-        var t = api.type.toLowerCase();
+        try { api.goto("control_surfaces " + i); } catch (e1) { continue; }
+        var t = "";
+        try { t = (api.type || "").toLowerCase(); } catch (e2) { t = ""; }
+        if (!t) { continue; }
         if (t.indexOf("launchpad") == -1) { continue; }
-        var cmp_count = api.getcount("components");
+        var cmp_count = safe_live_getcount(api, "components", 0);
         for (var j = 0; j < cmp_count; j++) {
-            api.goto("control_surfaces " + i + " components " + j);
-            if (api.type == "M4LInterface") {
+            try { api.goto("control_surfaces " + i + " components " + j); } catch (e3) { continue; }
+            var comp_type = "";
+            try { comp_type = api.type || ""; } catch (e4) { comp_type = ""; }
+            if (comp_type == "M4LInterface") {
                 l95_id = i;
-                l95_osd = new LiveAPI("control_surfaces " + l95_id + " components " + j);
-                updateML_handler = new LiveAPI(update, "control_surfaces " + l95_id + " components " + j);
-                updateML_handler.property = "updateML";
+                try { l95_osd = new LiveAPI("control_surfaces " + l95_id + " components " + j); } catch (e5) { l95_osd = null; }
+                try { updateML_handler = new LiveAPI(update, "control_surfaces " + l95_id + " components " + j); } catch (e6) { updateML_handler = null; }
+                if (updateML_handler) {
+                    try { updateML_handler.property = "updateML"; } catch (e7) { }
+                }
+                if (!l95_osd || !updateML_handler) { l95_id = -1; }
                 break;
             }
         }
@@ -815,46 +862,49 @@ function locate_l95(){
     if (l95_id != -1) {
         if (l95_located != 1) { log("found M4LInterface on control_surfaces " + l95_id); }
         l95_located = 1;
-    } else if (l95_located == 0) {
+        l95_not_found_reported = 0;
+    } else if (!l95_not_found_reported) {
         log("M4LInterface not found");
         l95_located = -1;
+        l95_not_found_reported = 1;
     }
 }
 
 function locate_osd(){
     var display = this.patcher;
-    var x = this.patcher.getnamed("osd");
+    var x = safe_getnamed(this.patcher, "osd");
     if (!x) { return; }
     display = x.subpatcher();
+    if (!display) { return; }
 
-    section_info_bp = display.getnamed("section_info_bp");
-    section_guide_bp = display.getnamed("section_guide_bp");
-    section_modeinfo_bp = display.getnamed("section_modeinfo_bp");
+    section_info_bp = safe_getnamed(display, "section_info_bp");
+    section_guide_bp = safe_getnamed(display, "section_guide_bp");
+    section_modeinfo_bp = safe_getnamed(display, "section_modeinfo_bp");
 
     if (section_info_bp && section_info_bp.subpatcher) {
         var info_p = section_info_bp.subpatcher();
-        header = info_p.getnamed("header");
-        mode = info_p.getnamed("mode");
-        info_0 = info_p.getnamed("info_0");
-        info_1 = info_p.getnamed("info_1");
+        header = safe_getnamed(info_p, "header");
+        mode = safe_getnamed(info_p, "mode");
+        info_0 = safe_getnamed(info_p, "info_0");
+        info_1 = safe_getnamed(info_p, "info_1");
         setup_attribute_boxes(info_p);
     }
 
     if (section_guide_bp && section_guide_bp.subpatcher) {
         var guide_p = section_guide_bp.subpatcher();
-        mode_guide_label = guide_p.getnamed("mode_guide_label");
-        mode_guide_pic = guide_p.getnamed("mode_guide_pic");
+        mode_guide_label = safe_getnamed(guide_p, "mode_guide_label");
+        mode_guide_pic = safe_getnamed(guide_p, "mode_guide_pic");
     }
 
     if (section_modeinfo_bp && section_modeinfo_bp.subpatcher) {
         var mi_p = section_modeinfo_bp.subpatcher();
-        mode_info_label = mi_p.getnamed("mode_info_label");
-        mode_info_box = mi_p.getnamed("mode_info");
+        mode_info_label = safe_getnamed(mi_p, "mode_info_label");
+        mode_info_box = safe_getnamed(mi_p, "mode_info");
     }
 
-    toggle_info = display.getnamed("toggle_info");
-    toggle_guide = display.getnamed("toggle_guide");
-    toggle_modeinfo = display.getnamed("toggle_modeinfo");
+    toggle_info = safe_getnamed(display, "toggle_info");
+    toggle_guide = safe_getnamed(display, "toggle_guide");
+    toggle_modeinfo = safe_getnamed(display, "toggle_modeinfo");
 
     if (section_info_bp && section_guide_bp && section_modeinfo_bp && !ui_located) {
         log("ui located");
@@ -864,15 +914,15 @@ function locate_osd(){
     if (!mode && !info_0 && !info_1) {
         // Fallback to original patcher objects if custom bpatchers are missing.
         display = this.patcher;
-        header = display.getnamed("header");
-        mode = display.getnamed("mode");
-        info_0 = display.getnamed("info_0");
-        info_1 = display.getnamed("info_1");
+        header = safe_getnamed(display, "header");
+        mode = safe_getnamed(display, "mode");
+        info_0 = safe_getnamed(display, "info_0");
+        info_1 = safe_getnamed(display, "info_1");
         setup_attribute_boxes(display);
-        if (!mode_guide_pic) { mode_guide_pic = display.getnamed("mode_guide_pic"); }
-        if (!mode_guide_label) { mode_guide_label = display.getnamed("mode_guide_label"); }
-        if (!mode_info_box) { mode_info_box = display.getnamed("mode_info"); }
-        if (!mode_info_label) { mode_info_label = display.getnamed("mode_info_label"); }
+        if (!mode_guide_pic) { mode_guide_pic = safe_getnamed(display, "mode_guide_pic"); }
+        if (!mode_guide_label) { mode_guide_label = safe_getnamed(display, "mode_guide_label"); }
+        if (!mode_info_box) { mode_info_box = safe_getnamed(display, "mode_info"); }
+        if (!mode_info_label) { mode_info_label = safe_getnamed(display, "mode_info_label"); }
     }
 
     // Refresh cached layout measurements once we (re)locate UI objects.
@@ -914,7 +964,7 @@ function set_window_size(p, w, h){
 function resize_window(h, w){
     if (!isFinite(w) || !isFinite(h)) { return; }
     try {
-        var osd = this.patcher.getnamed("osd");
+        var osd = safe_getnamed(this.patcher, "osd");
         if (osd && osd.subpatcher) {
             var p = osd.subpatcher();
             if (p && p.wind && p.wind.size) {
