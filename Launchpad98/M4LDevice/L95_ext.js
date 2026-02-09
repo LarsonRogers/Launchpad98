@@ -49,6 +49,8 @@ var info_content_h = 0;
 var screenshots_dir = "";
 var last_mode_id = "";
 var last_layout_mode_id = "";
+var mode_switch_task = null;
+var pending_mode_id = "";
 var layout_dirty = 1;
 var last_guide_rect = null;
 
@@ -431,7 +433,7 @@ function update(args){
     }
 
     mode_id_val = resolve_mode_id(mode_id_val, mode_val);
-    update_mode_assets(mode_id_val);
+    schedule_mode_assets(mode_id_val);
 
     sync_guide_rect();
 }
@@ -449,6 +451,34 @@ function init_ui(){
 
     apply_section_visibility();
     update_mode_assets("session");
+}
+
+function cancel_mode_switch_task() {
+    if (mode_switch_task) {
+        try { mode_switch_task.cancel(); } catch (e) { }
+        mode_switch_task = null;
+    }
+}
+
+function schedule_mode_assets(mode_id_val) {
+    var id = mode_id_val;
+    if (!id || id === "") { id = "session"; }
+    if (id == last_mode_id) {
+        pending_mode_id = "";
+        cancel_mode_switch_task();
+        update_mode_assets(id);
+        return;
+    }
+    pending_mode_id = id;
+    cancel_mode_switch_task();
+    mode_switch_task = new Task(function() {
+        var next_id = pending_mode_id;
+        pending_mode_id = "";
+        mode_switch_task = null;
+        update_mode_assets(next_id);
+    }, this);
+    mode_switch_task.interval = 50;
+    mode_switch_task.repeat(1);
 }
 
 function resolve_mode_id(mode_id_val, mode_val){
