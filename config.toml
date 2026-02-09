@@ -1,0 +1,9 @@
+# .codex/config.toml — Launchpad98 project config
+
+approval_policy = "on-failure"
+sandbox_mode = "workspace-write"
+
+[sandbox_workspace_write]
+network_access = true
+
+project_doc_fallback_filenames = ["CLAUDE.md"]
