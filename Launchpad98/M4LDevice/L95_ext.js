@@ -9,6 +9,10 @@ var mode;
 var info_0, info_1;
 var att_0,att_1,att_2,att_3,att_4,att_5,att_6,att_7;
 var att_n_0,att_n_1,att_n_2,att_n_3,att_n_4,att_n_5,att_n_6,att_n_7;
+var att_boxes = [];
+var att_name_boxes = [];
+var att_observers = [];
+var att_name_observers = [];
 
 var header = null;
 var mode_info_box = null;
@@ -194,6 +198,24 @@ var MODE_MAP = {
     }
 };
 
+var MODE_STRING_LOOKUP = [
+    {
+        "contains": "drum step sequencer",
+        "default_id": "drum_stepseq_combined",
+        "variants": [
+            { "contains": "scale", "id": "drum_stepseq_scale" },
+            { "contains": "multi", "id": "drum_stepseq_multinote" }
+        ]
+    },
+    {
+        "contains": "melodic step sequencer",
+        "default_id": "melodic_stepseq",
+        "variants": [
+            { "contains": "scale", "id": "melodic_stepseq_scale" }
+        ]
+    }
+];
+
 var anim_task = null;
 var anim_start_w = 0;
 var anim_start_h = 0;
@@ -213,6 +235,63 @@ function safe_item(arr, idx, fallback) {
     if (!arr || arr.length <= idx) { return fallback; }
     var v = arr[idx];
     return (v === undefined || v === null) ? fallback : v;
+}
+
+function set_att_box(index, box, is_name) {
+    if (is_name) {
+        att_name_boxes[index] = box;
+        switch (index) {
+            case 0: att_n_0 = box; break;
+            case 1: att_n_1 = box; break;
+            case 2: att_n_2 = box; break;
+            case 3: att_n_3 = box; break;
+            case 4: att_n_4 = box; break;
+            case 5: att_n_5 = box; break;
+            case 6: att_n_6 = box; break;
+            case 7: att_n_7 = box; break;
+        }
+    } else {
+        att_boxes[index] = box;
+        switch (index) {
+            case 0: att_0 = box; break;
+            case 1: att_1 = box; break;
+            case 2: att_2 = box; break;
+            case 3: att_3 = box; break;
+            case 4: att_4 = box; break;
+            case 5: att_5 = box; break;
+            case 6: att_6 = box; break;
+            case 7: att_7 = box; break;
+        }
+    }
+}
+
+function setup_attribute_boxes(container) {
+    if (!container || !container.getnamed) { return; }
+    for (var i = 0; i < 8; i++) {
+        set_att_box(i, container.getnamed("att_" + i), 0);
+        set_att_box(i, container.getnamed("att_n_" + i), 1);
+    }
+}
+
+function setup_attribute_observers() {
+    att_observers = [];
+    att_name_observers = [];
+    for (var i = 0; i < 8; i++) {
+        (function(idx) {
+            att_observers[idx] = function(values) {
+                var box = att_boxes[idx];
+                if (box) {
+                    box.message("set", safe_item(values, idx, " "));
+                }
+            };
+            att_name_observers[idx] = function(values) {
+                var box = att_name_boxes[idx];
+                if (box) {
+                    box.message("set", safe_item(values, idx, " "));
+                }
+            };
+        })(i);
+    }
 }
 
 function apply_guide_pic_rect(rect){
@@ -301,6 +380,7 @@ function ensure_screenshot_size(data) {
 }
 
 function bang() {
+    setup_attribute_observers();
     locate_l95();
     locate_osd();
     init_ui();
@@ -344,23 +424,10 @@ function update(args){
     if (info_0) { info_0.message("set", safe_item(info, 0, " ")); }
     if (info_1) { info_1.message("set", safe_item(info, 1, " ")); }
 
-    if (att_0) { att_0.message("set", safe_item(attributes, 0, " ")); }
-    if (att_1) { att_1.message("set", safe_item(attributes, 1, " ")); }
-    if (att_2) { att_2.message("set", safe_item(attributes, 2, " ")); }
-    if (att_3) { att_3.message("set", safe_item(attributes, 3, " ")); }
-    if (att_4) { att_4.message("set", safe_item(attributes, 4, " ")); }
-    if (att_5) { att_5.message("set", safe_item(attributes, 5, " ")); }
-    if (att_6) { att_6.message("set", safe_item(attributes, 6, " ")); }
-    if (att_7) { att_7.message("set", safe_item(attributes, 7, " ")); }
-
-    if (att_n_0) { att_n_0.message("set", safe_item(attribute_names, 0, " ")); }
-    if (att_n_1) { att_n_1.message("set", safe_item(attribute_names, 1, " ")); }
-    if (att_n_2) { att_n_2.message("set", safe_item(attribute_names, 2, " ")); }
-    if (att_n_3) { att_n_3.message("set", safe_item(attribute_names, 3, " ")); }
-    if (att_n_4) { att_n_4.message("set", safe_item(attribute_names, 4, " ")); }
-    if (att_n_5) { att_n_5.message("set", safe_item(attribute_names, 5, " ")); }
-    if (att_n_6) { att_n_6.message("set", safe_item(attribute_names, 6, " ")); }
-    if (att_n_7) { att_n_7.message("set", safe_item(attribute_names, 7, " ")); }
+    for (var i = 0; i < 8; i++) {
+        if (att_observers[i]) { att_observers[i](attributes); }
+        if (att_name_observers[i]) { att_name_observers[i](attribute_names); }
+    }
 
     mode_id_val = resolve_mode_id(mode_id_val, mode_val);
     update_mode_assets(mode_id_val);
@@ -387,13 +454,18 @@ function resolve_mode_id(mode_id_val, mode_val){
     var id = mode_id_val;
     if (!id || id === "" || !MODE_MAP[id]) {
         var m = (mode_val || "").toLowerCase();
-        if (m.indexOf("drum step sequencer") >= 0) {
-            if (m.indexOf("scale") >= 0) { id = "drum_stepseq_scale"; }
-            else if (m.indexOf("multi") >= 0) { id = "drum_stepseq_multinote"; }
-            else { id = "drum_stepseq_combined"; }
-        } else if (m.indexOf("melodic step sequencer") >= 0) {
-            if (m.indexOf("scale") >= 0) { id = "melodic_stepseq_scale"; }
-            else { id = "melodic_stepseq"; }
+        for (var i = 0; i < MODE_STRING_LOOKUP.length; i++) {
+            var group = MODE_STRING_LOOKUP[i];
+            if (m.indexOf(group.contains) < 0) { continue; }
+            id = group.default_id;
+            var variants = group.variants || [];
+            for (var j = 0; j < variants.length; j++) {
+                if (m.indexOf(variants[j].contains) >= 0) {
+                    id = variants[j].id;
+                    break;
+                }
+            }
+            break;
         }
     }
     return id;
@@ -765,22 +837,7 @@ function locate_osd(){
         mode = info_p.getnamed("mode");
         info_0 = info_p.getnamed("info_0");
         info_1 = info_p.getnamed("info_1");
-        att_0 = info_p.getnamed("att_0");
-        att_1 = info_p.getnamed("att_1");
-        att_2 = info_p.getnamed("att_2");
-        att_3 = info_p.getnamed("att_3");
-        att_4 = info_p.getnamed("att_4");
-        att_5 = info_p.getnamed("att_5");
-        att_6 = info_p.getnamed("att_6");
-        att_7 = info_p.getnamed("att_7");
-        att_n_0 = info_p.getnamed("att_n_0");
-        att_n_1 = info_p.getnamed("att_n_1");
-        att_n_2 = info_p.getnamed("att_n_2");
-        att_n_3 = info_p.getnamed("att_n_3");
-        att_n_4 = info_p.getnamed("att_n_4");
-        att_n_5 = info_p.getnamed("att_n_5");
-        att_n_6 = info_p.getnamed("att_n_6");
-        att_n_7 = info_p.getnamed("att_n_7");
+        setup_attribute_boxes(info_p);
     }
 
     if (section_guide_bp && section_guide_bp.subpatcher) {
@@ -811,22 +868,7 @@ function locate_osd(){
         mode = display.getnamed("mode");
         info_0 = display.getnamed("info_0");
         info_1 = display.getnamed("info_1");
-        att_0 = display.getnamed("att_0");
-        att_1 = display.getnamed("att_1");
-        att_2 = display.getnamed("att_2");
-        att_3 = display.getnamed("att_3");
-        att_4 = display.getnamed("att_4");
-        att_5 = display.getnamed("att_5");
-        att_6 = display.getnamed("att_6");
-        att_7 = display.getnamed("att_7");
-        att_n_0 = display.getnamed("att_n_0");
-        att_n_1 = display.getnamed("att_n_1");
-        att_n_2 = display.getnamed("att_n_2");
-        att_n_3 = display.getnamed("att_n_3");
-        att_n_4 = display.getnamed("att_n_4");
-        att_n_5 = display.getnamed("att_n_5");
-        att_n_6 = display.getnamed("att_n_6");
-        att_n_7 = display.getnamed("att_n_7");
+        setup_attribute_boxes(display);
         if (!mode_guide_pic) { mode_guide_pic = display.getnamed("mode_guide_pic"); }
         if (!mode_guide_label) { mode_guide_label = display.getnamed("mode_guide_label"); }
         if (!mode_info_box) { mode_info_box = display.getnamed("mode_info"); }
