@@ -1,5 +1,6 @@
 autowatch = 1;
 var L95_EXT_LOADED = 1;
+var LOG_ENABLED = 0;
 error("L95_EXT_ACTIVE");
 
 var l95_osd = null;
@@ -581,7 +582,6 @@ function apply_section_visibility(){
 }
 
 // L95 DEBUG OVERRIDES START
-var log_enabled = 0;
 var log_path = "";
 var last_screenshot_path = "";
 var boot_task = null;
@@ -695,7 +695,7 @@ function ensure_log_path(){
 }
 
 function log(msg){
-    if (!log_enabled) { return; }
+    if (!LOG_ENABLED) { return; }
     try {
         var path = ensure_log_path();
         if (!path || path.length === 0) { return; }
@@ -831,6 +831,10 @@ function locate_l95(){
     try {
         api = new LiveAPI();
     } catch (e0) {
+        if (!l95_not_found_reported) {
+            error("L95_ext: LiveAPI unavailable while discovering LP95.");
+            l95_not_found_reported = 1;
+        }
         l95_located = -1;
         return;
     }
@@ -860,10 +864,14 @@ function locate_l95(){
         if (l95_id != -1) { break; }
     }
     if (l95_id != -1) {
-        if (l95_located != 1) { log("found M4LInterface on control_surfaces " + l95_id); }
+        if (l95_located != 1) {
+            post("L95_ext: found M4LInterface on control_surfaces " + l95_id + "\n");
+            log("found M4LInterface on control_surfaces " + l95_id);
+        }
         l95_located = 1;
         l95_not_found_reported = 0;
     } else if (!l95_not_found_reported) {
+        error("L95_ext: M4LInterface not found.");
         log("M4LInterface not found");
         l95_located = -1;
         l95_not_found_reported = 1;
