@@ -40,9 +40,8 @@ GPL-3.0
 This is a **refactor/optimization pass only**. No new features.
 
 ### Known Issues in L95_ext.js
-1. **12 duplicate function definitions** — every function is defined twice (first definition,
-   then a "DEBUG OVERRIDES" version). Max JS uses last definition only, so the first 12
-   are dead code. Remove them.
+1. ~~**12 duplicate function definitions**~~ — ALREADY FIXED. The current version has
+   unique definitions only.
 2. **Repeated `att_0..att_7` / `att_n_0..att_n_7` patterns** — 16 individual observer
    callbacks that should be arrays iterated in a loop.
 3. **Mode string matching** — fragile string parsing of `osd.mode` to determine which
@@ -71,8 +70,8 @@ This is a **refactor/optimization pass only**. No new features.
 ```
 /                              # repo root
 ├── Launchpad98/               # the installable folder (copied to MIDI Remote Scripts)
-│   ├── Launchpad98OSD.amxd    # M4L device (binary — edit in Max only)
-│   └── ... (any resources bundled inside the .amxd)
+│   └── M4LDevice/
+│       └── L95_ext.js         # PRIMARY refactor target — edit this directly
 ├── CLAUDE.md                  # THIS FILE
 ├── AGENTS.md                  # Codex entry point
 ├── .claude/
@@ -86,13 +85,8 @@ This is a **refactor/optimization pass only**. No new features.
 └── toggledsections.png
 ```
 
-**Note**: `L95_ext.js` lives INSIDE `Launchpad98OSD.amxd`. To edit it, open the
-`.amxd` in Max, find the `js` object, and the script file will be in the device's
-resources. For refactoring, extract a working copy to the repo root, edit it, then
-re-import into the `.amxd` in Max.
-
-If there is a standalone `L95_ext.js` already at the repo root or in a subfolder,
-edit that directly — it's the authoritative copy.
+**Note**: `L95_ext.js` is at `Launchpad98/M4LDevice/L95_ext.js` and can be edited
+directly. The `.amxd` file in the same directory is binary — only edit in Max GUI.
 
 ---
 
@@ -134,43 +128,40 @@ autowatch = 1;            // Auto-reload on save
 ## Refactoring Prompts (for Claude Code, Codex, or any agent)
 
 Execute these in order. Git commit after each step. Test in Ableton between steps.
+The JS file is at `Launchpad98/M4LDevice/L95_ext.js`.
 
 ```
-1. "Read L95_ext.js completely. Identify all duplicate function definitions
-   (functions defined twice where Max JS only uses the last definition).
-   List them but do NOT edit yet. Output a summary of what you found."
+1. "Read L95_ext.js completely. Summarize its structure: how many functions,
+   how it discovers LP95, how it handles mode changes, and how the att_0..att_7
+   / att_n_0..att_n_7 observer callbacks work. Do NOT edit yet."
 
-2. "Remove all first-definition duplicates from L95_ext.js. Keep only the
-   second (DEBUG OVERRIDES) version of each function. Remove the
-   '// ===== DEBUG OVERRIDES =====' markers. Verify the file still has
-   exactly one definition of each function. Do not change any logic."
-
-3. "Refactor att_0 through att_7 and att_n_0 through att_n_7 observer
+2. "Refactor att_0 through att_7 and att_n_0 through att_n_7 observer
    callbacks into array-based loops. Create a single observer setup
    function that iterates 0..7 and registers callbacks. The observable
-   behavior must be identical — same attributes, same values, same timing."
+   behavior must be identical — same attributes, same values, same timing.
+   Follow ES5 only (no let/const/arrow)."
 
-4. "Consolidate all mode string matching into a single resolve_mode_id()
+3. "Consolidate all mode string matching into a single resolve_mode_id()
    function with a lookup table mapping mode strings to template names.
    Replace all scattered if/else chains that match on mode strings with
    calls to this function. Do not change which template is loaded for
    any given mode."
 
-5. "Add error handling: wrap all LiveAPI instantiations and property reads
+4. "Add error handling: wrap all LiveAPI instantiations and property reads
    in try/catch. Add null checks on getnamed() calls. If LP95 is not found,
    log once and stop — don't spam the console. Add a boot retry pattern:
    if discovery fails on loadbang, retry every 500ms up to 10 times with
    a Task, then give up with a single error message."
 
-6. "Add a LOG_ENABLED flag (var LOG_ENABLED = 0;) at the top of the file.
+5. "Add a LOG_ENABLED flag (var LOG_ENABLED = 0;) at the top of the file.
    Wrap every post() call in 'if (LOG_ENABLED)' guards. Exception: the
    boot discovery success/failure messages should always print."
 
-7. "Add a 50ms debounce on mode switch handling using a Task. If a new mode
+6. "Add a 50ms debounce on mode switch handling using a Task. If a new mode
    arrives within 50ms of the previous one, cancel the pending template
    load and use the newest mode only."
 
-8. "Final review: check for unused variables, unreachable code, any
+7. "Final review: check for unused variables, unreachable code, any
    remaining bare post() calls, and verify ES5 compliance (no let/const/
    arrow/template literals). List anything found."
 ```
